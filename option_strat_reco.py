@@ -17,6 +17,7 @@ import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 import streamlit as st
+import plotly.graph_objects as go
 
 # 1️⃣ Download 5 years of SPX, NDY, RTY, VIX
 tickers = ['^GSPC', '^NDX', '^RUT', '^VIX']
