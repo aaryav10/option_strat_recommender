@@ -72,7 +72,69 @@ report = classification_report(y_test, y_pred, output_dict=True)
 st.title("📊 Derivatives Strategy Recommender AI")
 
 st.subheader("Market Data Snapshot (SPX, NDX, RTY, VIX)")
-st.line_chart(data[['^GSPC', '^NDX', '^RUT', '^VIX']])
+
+# ============================
+# Rebase indices to 100
+# ============================
+rebased = data.copy()
+rebased['SPX_rebased'] = rebased['^GSPC'] / rebased['^GSPC'].iloc[0] * 100
+rebased['NDX_rebased'] = rebased['^NDX'] / rebased['^NDX'].iloc[0] * 100
+rebased['RTY_rebased'] = rebased['^RUT'] / rebased['^RUT'].iloc[0] * 100
+
+# ============================
+# Plotly figure with dual axis
+# ============================
+fig = go.Figure()
+
+# Add rebased indices
+fig.add_trace(go.Scatter(
+    x=rebased.index,
+    y=rebased['SPX_rebased'],
+    mode='lines',
+    name='SPX (rebased)'
+))
+fig.add_trace(go.Scatter(
+    x=rebased.index,
+    y=rebased['NDX_rebased'],
+    mode='lines',
+    name='NDX (rebased)'
+))
+fig.add_trace(go.Scatter(
+    x=rebased.index,
+    y=rebased['RTY_rebased'],
+    mode='lines',
+    name='RTY (rebased)'
+))
+
+# Add VIX on secondary y-axis
+fig.add_trace(go.Scatter(
+    x=rebased.index,
+    y=rebased['^VIX'],
+    mode='lines',
+    name='VIX',
+    yaxis='y2'
+))
+
+# Layout
+fig.update_layout(
+    title='Indices Rebased to 100 (SPX, NDX, RTY) + VIX',
+    xaxis_title='Date',
+    yaxis=dict(
+        title='Rebased Index Value',
+        showgrid=False
+    ),
+    yaxis2=dict(
+        title='VIX',
+        overlaying='y',
+        side='right',
+        showgrid=False
+    ),
+    legend=dict(x=0, y=1)
+)
+
+# Show in Streamlit
+st.plotly_chart(fig, use_container_width=True)
+
 
 st.subheader("Model Backtest Classification Report")
 st.json(report)
