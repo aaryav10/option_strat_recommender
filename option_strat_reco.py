@@ -18,6 +18,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import classification_report
 import streamlit as st
 import plotly.graph_objects as go
+from plotly.subplots import make_subplots
 
 # 1️⃣ Download 5 years of SPX, NDY, RTY, VIX
 tickers = ['^GSPC', '^NDX', '^RUT', '^VIX']
@@ -83,55 +84,55 @@ rebased['NDX_rebased'] = rebased['^NDX'] / rebased['^NDX'].iloc[0] * 100
 rebased['RTY_rebased'] = rebased['^RUT'] / rebased['^RUT'].iloc[0] * 100
 
 # ============================
-# Plotly figure with dual axis
+# Create subplots: 2 rows, shared X axis
 # ============================
-fig = go.Figure()
+fig = make_subplots(
+    rows=2, cols=1,
+    shared_xaxes=True,
+    vertical_spacing=0.1,
+    subplot_titles=("Indices Rebased to 100 (SPX, NDX, RTY)", "VIX Level")
+)
 
-# Add rebased indices
+# Top plot: Indices
 fig.add_trace(go.Scatter(
     x=rebased.index,
     y=rebased['SPX_rebased'],
     mode='lines',
     name='SPX (rebased)'
-))
+), row=1, col=1)
+
 fig.add_trace(go.Scatter(
     x=rebased.index,
     y=rebased['NDX_rebased'],
     mode='lines',
     name='NDX (rebased)'
-))
+), row=1, col=1)
+
 fig.add_trace(go.Scatter(
     x=rebased.index,
     y=rebased['RTY_rebased'],
     mode='lines',
     name='RTY (rebased)'
-))
+), row=1, col=1)
 
-# Add VIX on secondary y-axis
+# Bottom plot: VIX
 fig.add_trace(go.Scatter(
     x=rebased.index,
     y=rebased['^VIX'],
     mode='lines',
     name='VIX',
-    yaxis='y2'
-))
+    line=dict(color='orange')
+), row=2, col=1)
 
 # Layout
 fig.update_layout(
-    title='Indices Rebased to 100 (SPX, NDX, RTY) + VIX',
-    xaxis_title='Date',
-    yaxis=dict(
-        title='Rebased Index Value',
-        showgrid=False
-    ),
-    yaxis2=dict(
-        title='VIX',
-        overlaying='y',
-        side='right',
-        showgrid=False
-    ),
-    legend=dict(x=0, y=1)
+    height=600,
+    title_text="Market Snapshot: Indices vs VIX",
+    showlegend=True
 )
+
+fig.update_yaxes(title_text="Rebased Index Value", row=1, col=1)
+fig.update_yaxes(title_text="VIX", row=2, col=1)
 
 # Show in Streamlit
 st.plotly_chart(fig, use_container_width=True)
