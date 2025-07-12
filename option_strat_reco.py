@@ -7,8 +7,6 @@ Original file is located at
     https://colab.research.google.com/drive/1QyUEbCa3jRRnL6tLHJuRXz47fUkWjSgo
 """
 
-pip install streamlit
-
 # ================================
 # 📈 Derivatives Strategy Recommender - Proof of Concept
 # ================================
